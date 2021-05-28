@@ -4,7 +4,7 @@
 #  - checks and installs kubectl, helm and vault clients
 #  - If cloud platform is AWS, checks and installs aws-cli and aws-authenticator
 #######################################
-  - hosts: ansible_provisioners
+  - hosts: localhost
     gather_facts: yes
     no_log: "{{ no_ansible_log | default(false) }}"
     tasks:
