@@ -27,7 +27,7 @@ network:
   # Do not check-in docker_password.
   docker:
     url: "index.docker.io/hyperledgerlabs"
-    username: "docker_username"
+    username: "karankk1991"
     password: "docker_password"
   
   # Following are the configurations for the common Quorum network
@@ -69,32 +69,32 @@ network:
     - organization:
       name: carrier
       unit: Carrier
-      external_url_suffix: test.quorum.blockchaincloudpoc.com   # This is the url suffix that will be added in DNS recordset. Must be different for different clusters
-      cloud_provider: aws   # Options: aws, azure, gcp
-      aws:
-        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
-        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
+      external_url_suffix: quo.baf.quorum   # This is the url suffix that will be added in DNS recordset. Must be different for different clusters
+      cloud_provider: azure   # Options: aws, azure, gcp
+      #aws:
+      #  access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+      #  secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
       # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
       # the cluster has already been created.
       k8s:
-        context: "cluster_context"
-        config_file: "cluster_config"
+        context: "Quorum-BAF"
+        config_file: "/home/karan_kachroo/.kube/config"
       # Hashicorp Vault server address and root-token. Vault should be unsealed.
       # Do not check-in root_token
       vault:
-        url: "vault_addr"
-        root_token: "vault_root_token"
+        url: "http://20.72.171.165:8200"
+        root_token: "s.HsagI2xVFIK6phwXlr16p8TQ"
         secret_path: "secret"
       # Git Repo details which will be used by GitOps/Flux.
       # Do not check-in git_access_token
       gitops:
         git_protocol: "https" # Option for git over https or ssh
-        git_url: "https://github.com/<username>/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
-        branch: "develop"           # Git branch where release is being made
+        git_url: "https://github.com/karankk1991/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
+        branch: "master"           # Git branch where release is being made
         release_dir: "platforms/quorum/releases/dev" # Relative Path in the Git repo for flux sync per environment. 
         chart_source: "platforms/quorum/charts"     # Relative Path where the Helm charts are stored in Git repo
         git_repo: "github.com/<username>/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
-        username: "git_username"          # Git Service user who has rights to check-in in all branches
+        username: "karank1991"          # Git Service user who has rights to check-in in all branches
         password: "git_access_token"          # Git Server user password/token (Optional for ssh; Required for https)
         email: "git_email"                # Email to use in git config
         private_key: "path_to_private_key"          # Path to private key file which has write-access to the git repo (Optional for https; Required for ssh)
@@ -127,32 +127,32 @@ network:
     - organization:
       name: manufacturer
       unit: Manufacturer
-      external_url_suffix: test.quorum.blockchaincloudpoc.com      
-      cloud_provider: aws   # Options: aws, azure, gcp
-      aws:
-        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
-        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
+      external_url_suffix: quo.baf.quorum      
+      cloud_provider: azure   # Options: aws, azure, gcp
+      #aws:
+      #  access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+      #  secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
       # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
       # the cluster has already been created.
       k8s:
-        context: "cluster_context"
-        config_file: "cluster_config"
+        context: "Quorum-BAF"
+        config_file: "/home/karan_kachroo/.kube/config"
       # Hashicorp Vault server address and root-token. Vault should be unsealed.
       # Do not check-in root_token
       vault:
-        url: "vault_addr"
-        root_token: "vault_root_token"
+        url: "http://20.72.171.165:8200"
+        root_token: "s.HsagI2xVFIK6phwXlr16p8TQ"
         secret_path: "secret"
       # Git Repo details which will be used by GitOps/Flux.
       # IMPORTANT: Do not check-in your password, the git_access_token!
       gitops:
         git_protocol: "https" # Option for git over https or ssh
-        git_url: "https://github.com/<username>/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
-        branch: "develop"           # Git branch where release is being made
+        git_url: "https://github.com/karankk1991/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
+        branch: "master"           # Git branch where release is being made
         release_dir: "platforms/quorum/releases/dev" # Relative Path in the Git repo for flux sync per environment. 
         chart_source: "platforms/quorum/charts"     # Relative Path where the Helm charts are stored in Git repo
-        git_repo: "github.com/<username>/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
-        username: "git_username"          # Git Service user who has rights to check-in in all branches
+        git_repo: "github.com/karankk1991/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
+        username: "karankk1991"          # Git Service user who has rights to check-in in all branches
         password: "git_access_token"          # Git Server user password/token (Optional for ssh; Required for https)
         email: "git_email"                # Email to use in git config
         private_key: "path_to_private_key"          # Path to private key file which has write-access to the git repo (Optional for https; Required for ssh)
@@ -184,32 +184,32 @@ network:
     - organization:
       name: store
       unit: Store
-      external_url_suffix: test.quorum.blockchaincloudpoc.com      
-      cloud_provider: aws   # Options: aws, azure, gcp
-      aws:
-        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
-        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
+      external_url_suffix: quo.baf.quorum      
+      cloud_provider: azure   # Options: aws, azure, gcp
+      #aws:
+      #  access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+      #  secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
       # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
       # the cluster has already been created.
       k8s:
-        context: "cluster_context"
-        config_file: "cluster_config"
+        context: "Quorum-BAF"
+        config_file: "/home/karan_kachroo/.kube/config"
       # Hashicorp Vault server address and root-token. Vault should be unsealed.
       # Do not check-in root_token
       vault:
-        url: "vault_addr"
-        root_token: "vault_root_token"
+        url: "http://20.72.171.165:8200"
+        root_token: "s.HsagI2xVFIK6phwXlr16p8TQ"
         secret_path: "secret"
       # Git Repo details which will be used by GitOps/Flux.
       # IMPORTANT: Do not check-in your password, the git_access_token!
       gitops:
         git_protocol: "https" # Option for git over https or ssh
-        git_url: "https://github.com/<username>/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
+        git_url: "https://github.com/karankk1991/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
         branch: "develop"           # Git branch where release is being made
         release_dir: "platforms/quorum/releases/dev" # Relative Path in the Git repo for flux sync per environment. 
         chart_source: "platforms/quorum/charts"     # Relative Path where the Helm charts are stored in Git repo
-        git_repo: "github.com/<username>/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
-        username: "git_username"          # Git Service user who has rights to check-in in all branches
+        git_repo: "github.com/karankk1991/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
+        username: "karankk1991"          # Git Service user who has rights to check-in in all branches
         password: "git_access_token"          # Git Server user password/token (Optional for ssh; Required for https)
         email: "git_email"                # Email to use in git config
         private_key: "path_to_private_key"          # Path to private key file which has write-access to the git repo (Optional for https; Required for ssh)
@@ -240,32 +240,32 @@ network:
     - organization:
       name: warehouse
       unit: Warehouse
-      external_url_suffix: test.quorum.blockchaincloudpoc.com      
-      cloud_provider: aws   # Options: aws, azure, gcp
-      aws:
-        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
-        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
+      external_url_suffix: quo.baf.quorum      
+      cloud_provider: azure   # Options: aws, azure, gcp
+      #aws:
+      #  access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+      #  secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws  
       # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
       # the cluster has already been created.
       k8s:
-        context: "cluster_context"
-        config_file: "cluster_config"
+        context: "Quorum-BAF"
+        config_file: "/home/karan_kachroo/.kube/config"
       # Hashicorp Vault server address and root-token. Vault should be unsealed.
       # Do not check-in root_token
       vault:
-        url: "vault_addr"
-        root_token: "vault_root_token"
+        url: "http://20.72.171.165:8200"
+        root_token: "s.HsagI2xVFIK6phwXlr16p8TQ"
         secret_path: "secret"
       # Git Repo details which will be used by GitOps/Flux.
       # Do not check-in git_access_token
       gitops:
         git_protocol: "https" # Option for git over https or ssh
-        git_url: "https://github.com/<username>/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
+        git_url: "https://github.com/karankk1991/blockchain-automation-framework.git"         # Gitops https or ssh url for flux value files 
         branch: "develop"           # Git branch where release is being made
         release_dir: "platforms/quorum/releases/dev" # Relative Path in the Git repo for flux sync per environment. 
         chart_source: "platforms/quorum/charts"     # Relative Path where the Helm charts are stored in Git repo
-        git_repo: "github.com/<username>/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
-        username: "git_username"          # Git Service user who has rights to check-in in all branches
+        git_repo: "github.com/karankk1991/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
+        username: "karankk1991"          # Git Service user who has rights to check-in in all branches
         password: "git_access_token"          # Git Server user password/token (Optional for ssh; Required for https)
         email: "git_email"                # Email to use in git config
         private_key: "path_to_private_key"          # Path to private key file which has write-access to the git repo (Optional for https; Required for ssh)
