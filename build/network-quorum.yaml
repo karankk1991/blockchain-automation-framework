@@ -94,7 +94,7 @@ network:
         release_dir: "platforms/quorum/releases/dev" # Relative Path in the Git repo for flux sync per environment. 
         chart_source: "platforms/quorum/charts"     # Relative Path where the Helm charts are stored in Git repo
         git_repo: "github.com/karankk1991/blockchain-automation-framework.git"   # Gitops git repository URL for git push 
-        username: "karank1991"          # Git Service user who has rights to check-in in all branches
+        username: "karankk1991"          # Git Service user who has rights to check-in in all branches
         password: "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"          # Git Server user password/token (Optional for ssh; Required for https)
         email: "karankk1991@gmail.com"                # Email to use in git config
         private_key: "path_to_private_key"          # Path to private key file which has write-access to the git repo (Optional for https; Required for ssh)
