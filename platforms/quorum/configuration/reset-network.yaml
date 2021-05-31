@@ -6,7 +6,7 @@
 ###########################################################################################
 ---
   # This will apply to ansible_provisioners. /etc/ansible/hosts should be configured with this group
-- hosts: ansible_provisioners
+- hosts: localhost
   gather_facts: no
   no_log: "{{ no_ansible_log | default(false) }}"
   tasks:
