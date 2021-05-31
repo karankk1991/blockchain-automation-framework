@@ -23,6 +23,7 @@
 *.tmproj
 **/.gradle/*
 # Ignore folder named 'build'
+build/network-quorum.yaml
 **/build*/
 **/crypto-config*/*
 **/go/*
