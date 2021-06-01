@@ -1,0 +1,81 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: carriercarriertessera
+  namespace: carrier-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: carriercarriertessera
+  helmVersion: v3
+  chart:
+    git: https://github.com/karankk1991/blockchain-automation-framework.git
+    ref: master
+    path: platforms/quorum/charts/node_tessera  
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: carrier-quo
+      labels:
+    images:
+      node: quorumengineering/quorum:2.5.0
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      tessera: quorumengineering/tessera:0.10.4
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+    node:
+      name: carrier
+      status: default
+      consensus: ibft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      
+      servicetype: ClusterIP
+      lock: false
+      ports:
+        rpc: 8546
+        raft: 50401
+        tm: 443
+        quorum: 21000
+        db: 3306
+      dbname: demodb
+      mysqluser: demouser
+    vault:
+      address: http://20.72.171.165:8200
+      secretprefix: secret/carrier-quo/crypto/carrier
+      serviceaccountname: vault-auth
+      keyname: quorum
+      tm_keyname: transaction
+      role: vault-role
+      authpath: quorumcarrier
+    tessera:
+      dburl: "jdbc:mysql://carrier:3306/demodb"
+      dbusername: demouser
+      url: "https://carrier.quo.baf.quorum:443"
+      othernodes:
+        - url: https://carrier.quo.baf.quorum
+        - url: https://manufacturer.quo.baf.quorum
+        - url: https://store.quo.baf.quorum
+        - url: https://warehouse.quo.baf.quorum
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICAgImNvbmZpZyI6IHsKICAgICAgICAiY2hhaW5JZCI6IDEwLAogICAgICAgICJob21lc3RlYWRCbG9jayI6IDAsCiAgICAgICAgImVpcDE1MEJsb2NrIjogMCwKICAgICAgICAiZWlwMTUwSGFzaCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgICAgICJlaXAxNTVCbG9jayI6IDAsCiAgICAgICAgImVpcDE1OEJsb2NrIjogMCwKICAgICAgICAiYnl6YW50aXVtQmxvY2siOiAxLAogICAgICAgICJjb25zdGFudGlub3BsZUJsb2NrIjogMCwKICAgICAgICAiaXN0YW5idWwiOiB7CiAgICAgICAgICAgICJlcG9jaCI6IDMwMDAwLAogICAgICAgICAgICAicG9saWN5IjogMCwKICAgICAgICAgICAgImNlaWwyTmJ5M0Jsb2NrIjogMAogICAgICAgIH0sCiAgICAgICAgInR4blNpemVMaW1pdCI6IDEyOCwKICAgICAgICAibWF4Q29kZVNpemUiOiAxMjgsCiAgICAgICAgImlzUXVvcnVtIjogdHJ1ZQogICAgfSwKICAgICJub25jZSI6ICIweDAiLAogICAgInRpbWVzdGFtcCI6ICIweDYwYjYxM2Y2IiwKICAgICJleHRyYURhdGEiOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwZjg5YWY4NTQ5NDkzZWI5ZmJjOGMxMzM3Yzk0Zjk0YTllNjU0MDVjYTk5NTc5Yzk2YzI5NGRjNGE3NjhiZTc4ZjhmM2IxYWFmOThiODk1NThkMjhhNWYyYzVhMjk5NDJkZDA3YjYyZTZiOWIyMzkwYjAyNGRkMDUyZDk1OGE4NzUxMGM4ODA5NGVmNGZhZWExMzk2MDRmNzExZDc2OWQ3NWVjMTMyNGVjMzc3NjViYjliODQxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGMwIiwKICAgICJnYXNMaW1pdCI6ICIweGUwMDAwMDAwIiwKICAgICJkaWZmaWN1bHR5IjogIjB4MSIsCiAgICAibWl4SGFzaCI6ICIweDYzNzQ2OTYzNjE2YzIwNjI3OTdhNjE2ZTc0Njk2ZTY1MjA2NjYxNzU2Yzc0MjA3NDZmNmM2NTcyNjE2ZTYzNjUiLAogICAgImNvaW5iYXNlIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAiYWxsb2MiOiB7CiAgICAgICAgIjJkZDA3YjYyZTZiOWIyMzkwYjAyNGRkMDUyZDk1OGE4NzUxMGM4ODAiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgIjkzZWI5ZmJjOGMxMzM3Yzk0Zjk0YTllNjU0MDVjYTk5NTc5Yzk2YzIiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImRjNGE3NjhiZTc4ZjhmM2IxYWFmOThiODk1NThkMjhhNWYyYzVhMjkiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImVmNGZhZWExMzk2MDRmNzExZDc2OWQ3NWVjMTMyNGVjMzc3NjViYjkiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgICAgIH0KICAgIH0sCiAgICAibnVtYmVyIjogIjB4MCIsCiAgICAiZ2FzVXNlZCI6ICIweDAiLAogICAgInBhcmVudEhhc2giOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgp9
+    staticnodes: 
+      [
+    "enode://b8bed005029dc3722640b047790f7b1e9dc00737354e3b29a3ff47b4a6477a12c1d55efdb0c2c5f7d3051ff11206df917a3934dbdc76a7766ae3120e81218ec6@carrier.quo.baf.quorum:15010?discport=0",
+    "enode://3d4e2ce82856cf2ef80594862d23492416e83a7564fc50cdc92cc75c6a5f44fedee07088e08b771d5264ef2d2ed3b4764d3d0678a3525afd71b092d9c1e9da98@manufacturer.quo.baf.quorum:15020?discport=0",
+    "enode://3671ba886a2585172b477f8092e33c8471b4315b5545e962eb8b7b2d0ef8b9c502a547f4532ad8f1880a6d04a5a82a5512be1133c223292e0a7f49e6c3915fc5@store.quo.baf.quorum:15030?discport=0",
+    "enode://df2465f835e95c03858210198b2ce698689c0570cb2412ad16e4cb93c08bf123c8ab5050b9ad89dacd4d73daff65390bf3c2e41b524ef63d0d5e4a27c72bf3b0@warehouse.quo.baf.quorum:15040?discport=0"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: carrier.quo.baf.quorum
+      portTM: 443
+      rpcport: 15011
+      quorumport: 15010
+    storage:
+      storageclassname: azurestorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
