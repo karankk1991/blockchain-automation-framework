@@ -22,10 +22,7 @@
 .settings
 *.tmproj
 **/.gradle/*
-!nt.yaml
 # Ignore folder named 'build'
-build/
-build/network-quorum.yaml
 **/build*/
 **/crypto-config*/*
 **/go/*
