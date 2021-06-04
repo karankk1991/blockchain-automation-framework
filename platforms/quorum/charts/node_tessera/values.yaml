@@ -4,6 +4,11 @@
 #Provide the number of replicas for pods
 #Eg. replicaCount: 1
 replicaCount: 1
+akv:
+  keyvaultname: baf-quorum
+  resourcegroup: BAF-quorum
+  subscriptionid: 
+  tenantid: 54767e66-b7ee-450d-94fd-28a39fda1d0b
 
 metadata:
   #Provide the namespace for the Quorum node
