@@ -1,7 +1,7 @@
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
-  name: {{ $.Values.peer.name }}-admincerts
+#  name: {{ $.Values.peer.name }}-admincerts
   namespace: {{ $.Values.metadata.namespace }}
 spec:
   provider: azure
@@ -15,7 +15,7 @@ spec:
     objects:  |
       array:
         - |
-          objectName: {{ $.Values.peer.name }}-{{ $.Values.peer.localmspid }}-admincerts
+          objectName: {{ $.Values.node.name }}-admincerts
           objectAlias: "admin.crt"     # [OPTIONAL available for version > 0.0.4] object alias
           objectType: secret        # object types: secret, key or cert. For Key Vault certificates, refer to https://github.com/Azure/secrets-store-csi-driver-provider-azure/blob/master/docs/getting-certs-and-keys.md for the object type to use
           objectVersion: ""         # [OPTIONAL] object versions, default to latest if empty
@@ -86,121 +86,121 @@ spec:
               - key: tessera-config-9.0.json.tmpl
                 path: tessera-config-9.0.json.tmpl
       initContainers:
-      - name: certificates-init
-        image: {{ .Values.images.alpineutils }}
-        imagePullPolicy: Always
-        env:
-        - name: VAULT_ADDR
-          value: {{ .Values.vault.address }}
-        - name: VAULT_SECRET_PREFIX
-          value: {{ .Values.vault.secretprefix }}
-        - name: KUBERNETES_AUTH_PATH
-          value: {{ .Values.vault.authpath }}
-        - name: VAULT_APP_ROLE
-          value: {{ .Values.vault.role }}
-        - name: MOUNT_PATH
-          value: "/secret"
-        command: ["sh", "-c"]
-        args:
-        - |-
-          #!/bin/bash
+      # - name: certificates-init
+      #   image: {{ .Values.images.alpineutils }}
+      #   imagePullPolicy: Always
+      #   env:
+      #   - name: VAULT_ADDR
+      #     value: {{ .Values.vault.address }}
+      #   - name: VAULT_SECRET_PREFIX
+      #     value: {{ .Values.vault.secretprefix }}
+      #   - name: KUBERNETES_AUTH_PATH
+      #     value: {{ .Values.vault.authpath }}
+      #   - name: VAULT_APP_ROLE
+      #     value: {{ .Values.vault.role }}
+      #   - name: MOUNT_PATH
+      #     value: "/secret"
+      #   command: ["sh", "-c"]
+      #   args:
+      #   - |-
+      #     #!/bin/bash
           
-          validateVaultResponse () {
-          if echo ${2} | grep "errors"; then
-           echo "ERROR: unable to retrieve ${1}: ${2}"
-           exit 1
-           fi
-          }
-          KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-          echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
-          #Login to Vault and so I can get an approle token
-          VAULT_CLIENT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login \
-            -H "Content-Type: application/json" \
-            -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
-            jq -r 'if .errors then . else .auth.client_token end')
-          validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
+      #     validateVaultResponse () {
+      #     if echo ${2} | grep "errors"; then
+      #      echo "ERROR: unable to retrieve ${1}: ${2}"
+      #      exit 1
+      #      fi
+      #     }
+      #     KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+      #     echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
+      #     #Login to Vault and so I can get an approle token
+      #     VAULT_CLIENT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login \
+      #       -H "Content-Type: application/json" \
+      #       -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
+      #       jq -r 'if .errors then . else .auth.client_token end')
+      #     validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
-          echo "Getting 5 keys from $vault_secret_key"          
-          LOOKUP_SECRET_RESPONSE=$(curl -sS \
-            --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
-            ${VAULT_ADDR}/v1/${vault_secret_key} | \
-            jq -r 'if .errors then . else . end')
-          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" 
-          nodekey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["nodekey"]')
-          keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["keystore"]')
-          gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["gethpassword"]')
-          username=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_user"]')
-          password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_password"]')
+      #     vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
+      #     echo "Getting 5 keys from $vault_secret_key"          
+      #     LOOKUP_SECRET_RESPONSE=$(curl -sS \
+      #       --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
+      #       ${VAULT_ADDR}/v1/${vault_secret_key} | \
+      #       jq -r 'if .errors then . else . end')
+      #     validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" 
+      #     nodekey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["nodekey"]')
+      #     keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["keystore"]')
+      #     gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["gethpassword"]')
+      #     username=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_user"]')
+      #     password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_password"]')
           
-          OUTPUT_PATH="${MOUNT_PATH}/keys"
-          mkdir -p ${OUTPUT_PATH}
+      #     OUTPUT_PATH="${MOUNT_PATH}/keys"
+      #     mkdir -p ${OUTPUT_PATH}
           
-          echo -n "${gethpassword}" > ${OUTPUT_PATH}/passwords.txt
-          echo -n "${nodekey}" > ${OUTPUT_PATH}/nodekey
-          echo -n "${keystore}" > ${OUTPUT_PATH}/{{ .Values.node.keystore }}
-          echo "${username}" > ${OUTPUT_PATH}/username
-          echo "${password}" > ${OUTPUT_PATH}/password
+      #     echo -n "${gethpassword}" > ${OUTPUT_PATH}/passwords.txt
+      #     echo -n "${nodekey}" > ${OUTPUT_PATH}/nodekey
+      #     echo -n "${keystore}" > ${OUTPUT_PATH}/{{ .Values.node.keystore }}
+      #     echo "${username}" > ${OUTPUT_PATH}/username
+      #     echo "${password}" > ${OUTPUT_PATH}/password
 
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tm_keyname }}"
-          echo "Getting 2 keys from $vault_secret_key"          
-          LOOKUP_SECRET_RESPONSE=$(curl -sS \
-            --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
-            ${VAULT_ADDR}/v1/${vault_secret_key} | \
-            jq -r 'if .errors then . else . end')
-          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" 
+      #     vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tm_keyname }}"
+      #     echo "Getting 2 keys from $vault_secret_key"          
+      #     LOOKUP_SECRET_RESPONSE=$(curl -sS \
+      #       --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
+      #       ${VAULT_ADDR}/v1/${vault_secret_key} | \
+      #       jq -r 'if .errors then . else . end')
+      #     validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" 
 
-          tmpub=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["tm.pub"]')
-          tmkey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["tm.key"]')
-          echo -n "${tmpub}" > ${OUTPUT_PATH}/tm.pub
-          echo -n "${tmkey}" > ${OUTPUT_PATH}/tm.key
+      #     tmpub=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["tm.pub"]')
+      #     tmkey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["tm.key"]')
+      #     echo -n "${tmpub}" > ${OUTPUT_PATH}/tm.pub
+      #     echo -n "${tmkey}" > ${OUTPUT_PATH}/tm.key
          
-        volumeMounts:
-        - name: certificates
-          mountPath: /secret
-      - name: mysql-init
-        image: {{ .Values.images.busybox }}
-        command: ["/bin/sh"]
-        args:
-        - "-cx"
-        - |-
-          #!/bin/bash
+      #   volumeMounts:
+      #   - name: certificates
+      #     mountPath: /secret
+      # - name: mysql-init
+      #   image: {{ .Values.images.busybox }}
+      #   command: ["/bin/sh"]
+      #   args:
+      #   - "-cx"
+      #   - |-
+      #     #!/bin/bash
 
-          echo "getting username and password from vault"          
-          var=$(cat /secret/keys/password)         
-          cat << EOF > /docker-entrypoint-initdb.d/createTables.sql
-          UPDATE mysql.user SET authentication_string = PASSWORD('$var') WHERE User = 'demouser';
-          UPDATE mysql.user SET authentication_string = PASSWORD('$var') WHERE User = 'root';
-          CREATE TABLE IF NOT EXISTS ENCRYPTED_TRANSACTION (ENCODED_PAYLOAD BLOB NOT NULL, HASH VARBINARY(100) NOT NULL, TIMESTAMP BIGINT, PRIMARY KEY (HASH));
-          CREATE TABLE IF NOT EXISTS ENCRYPTED_RAW_TRANSACTION (ENCRYPTED_KEY BLOB NOT NULL, ENCRYPTED_PAYLOAD BLOB NOT NULL, NONCE BLOB NOT NULL, SENDER BLOB NOT NULL, TIMESTAMP BIGINT, HASH VARBINARY(100) NOT NULL, PRIMARY KEY (HASH));
-          EOF
-        volumeMounts:
-        - name: mysql
-          mountPath: /docker-entrypoint-initdb.d
-        - name: certificates
-          mountPath: /secret
-      - name: quorum-genesis-init-container
-        image: "{{ .Values.images.node }}"
-        command: [ "sh" ]
-        args:
-        - "-cx"
-        - "mkdir -p $QUORUM_DATA_DIR;
-          cat {{ .Values.node.mountPath }}/genesis/genesis.json.base64 | base64 -d > $QUORUM_DATA_DIR/genesis.json;
-            if [ ! -f $QUORUM_DATA_DIR/genesis_created ]; then
-              /usr/local/bin/geth --datadir $QUORUM_DATA_DIR init $QUORUM_DATA_DIR/genesis.json;
-              date > $QUORUM_DATA_DIR/genesis_created;
-            fi;
-          "
-        env:
-          - name: QUORUM_DATA_DIR
-            value: {{ .Values.node.mountPath }}/dd
-          - name: QHOME
-            value: {{ .Values.node.mountPath }}
-        volumeMounts:
-        - name: {{ .Values.node.name }}-pv
-          mountPath: {{ .Values.node.mountPath }}
-        - name: {{ .Values.node.name }}-genesis-volume
-          mountPath: {{ .Values.node.mountPath }}/genesis
+      #     echo "getting username and password from vault"          
+      #     var=$(cat /secret/keys/password)         
+      #     cat << EOF > /docker-entrypoint-initdb.d/createTables.sql
+      #     UPDATE mysql.user SET authentication_string = PASSWORD('$var') WHERE User = 'demouser';
+      #     UPDATE mysql.user SET authentication_string = PASSWORD('$var') WHERE User = 'root';
+      #     CREATE TABLE IF NOT EXISTS ENCRYPTED_TRANSACTION (ENCODED_PAYLOAD BLOB NOT NULL, HASH VARBINARY(100) NOT NULL, TIMESTAMP BIGINT, PRIMARY KEY (HASH));
+      #     CREATE TABLE IF NOT EXISTS ENCRYPTED_RAW_TRANSACTION (ENCRYPTED_KEY BLOB NOT NULL, ENCRYPTED_PAYLOAD BLOB NOT NULL, NONCE BLOB NOT NULL, SENDER BLOB NOT NULL, TIMESTAMP BIGINT, HASH VARBINARY(100) NOT NULL, PRIMARY KEY (HASH));
+      #     EOF
+      #   volumeMounts:
+      #   - name: mysql
+      #     mountPath: /docker-entrypoint-initdb.d
+      #   - name: certificates
+      #     mountPath: /secret
+      # - name: quorum-genesis-init-container
+      #   image: "{{ .Values.images.node }}"
+      #   command: [ "sh" ]
+      #   args:
+      #   - "-cx"
+      #   - "mkdir -p $QUORUM_DATA_DIR;
+      #     cat {{ .Values.node.mountPath }}/genesis/genesis.json.base64 | base64 -d > $QUORUM_DATA_DIR/genesis.json;
+      #       if [ ! -f $QUORUM_DATA_DIR/genesis_created ]; then
+      #         /usr/local/bin/geth --datadir $QUORUM_DATA_DIR init $QUORUM_DATA_DIR/genesis.json;
+      #         date > $QUORUM_DATA_DIR/genesis_created;
+      #       fi;
+      #     "
+      #   env:
+      #     - name: QUORUM_DATA_DIR
+      #       value: {{ .Values.node.mountPath }}/dd
+      #     - name: QHOME
+      #       value: {{ .Values.node.mountPath }}
+      #   volumeMounts:
+      #   - name: {{ .Values.node.name }}-pv
+      #     mountPath: {{ .Values.node.mountPath }}
+      #   - name: {{ .Values.node.name }}-genesis-volume
+      #     mountPath: {{ .Values.node.mountPath }}/genesis
       containers:
       - name: mysql-db
         image: {{ .Values.images.mysql }}
